@@ -1,5 +1,8 @@
 $(document).ready(function() {
 
+     moment().format("[today]");
+     console.log(moment().format('LLLL'));
+
     // Initialize Firebase
     // Initialize Firebase
     var config = {
@@ -11,50 +14,30 @@ $(document).ready(function() {
   };
 
     firebase.initializeApp(config);
+    
     var dataRef = firebase.database();
     //on click function to add values
 
-     dataRef.ref().on("child_added", function(childSnapshot) {
-
-            // Log everything that's coming out of snapshot
-            
-            console.log(childSnapshot.val());
-            // console.log(childSnapshot.val().Role);
-            // console.log(childSnapshot.val().StartDate);
-            // console.log(childSnapshot.val().MonthlyRate);
-
-            //   // full list of items to the well
-
-            $(".table tbody").append("<tr><td id='train-name-display'> " + childSnapshot.val().trainName +
-                "</td><td id='destination-display'>" + childSnapshot.val().destination +
-                "</td><td id='frequency-display'>" + childSnapshot.val().frequency +
-                "</td><td id='minutes-away-display'>" + childSnapshot.val().minAway);
-        });
-
+     
     $("#submitForm").on("click", function(event) {
         event.preventDefault();
 
-
-        var name = $("#train-name-input").val().trim();
+        var trainName = $("#train-name-input").val().trim();
         var destination = $("#destination-input").val().trim();
         var firstTrain = $("#first-train-input").val().trim();
-        var minAway = $("#minAway-input").val().trim();
+        var minAway = $("#minutes-away-input").val().trim();
+        var frequency = $("#frequency-min-input").val().trim();
+        console.log(frequency);
         // alert("test")
 
         // At the initial load, get a snapshot of the current data.
         dataRef.ref().push({
-
-            //JOES WORK BELOW
-            // name: name,
-            // email: email, 
-            // age: age, 
-            // comment: comment, 
-            // firstTrainAdded: firebase.database.ServerValue.TIMESTAMP
-
-            MonthlyRate: rate,
-            Role: role,
-            StartfirstTrain: firstTrain,
-            eName: name,
+          
+            trainName: trainName,
+            destination: destination,
+            firstTrain: firstTrain,
+            frequency: frequency,
+            firstTrainAdded: firebase.database.ServerValue.TIMESTAMP
         });
 
         //Firebase water + initial loader HINK: this code behaves similarly to .on("value")
@@ -62,7 +45,7 @@ $(document).ready(function() {
 
         // dataRef.ref().limitToLast(1).on("child_added", function(snapshot){
 
-        // 	 $(".table tbody").append("<tr><td id='name-display'> " + snapshot.val().eName +
+        //   $(".table tbody").append("<tr><td id='name-display'> " + snapshot.val().eName +
         //         "</td><td id='role-display'>" + snapshot.val().Role +
         //         "</td><td id='firstTrain-display'>" + snapshot.val().StartfirstTrain +
         //         "</td><td id='month-display'>" + snapshot.val().MonthlyRate);
@@ -70,10 +53,31 @@ $(document).ready(function() {
 
     });
 
-    // // Handle the errors
-    // }, function(errorObject) {
-    //   console.log("Errors handled: " + errorObject.code);
-    // });
+    dataRef.ref().on("child_added", function(childSnapshot) {
+
+            // Log everything that's coming out of snapshot
+            
+            console.log(childSnapshot.val());
+            console.log(childSnapshot.val().trainName);
+            console.log(childSnapshot.val().destination);
+            console.log(childSnapshot.val().firstTrain);
+            console.log(childSnapshot.val().frequency);
+
+
+       // full list of items to the well and adding it appending to the DOM via JQuery
+        $(".table tbody").append("<tr><td id='train-name-display'> " + childSnapshot.val().trainName +
+            "</td><td id='destination-display'>" + childSnapshot.val().destination +
+            "</td><td id='frequency-display'>" + childSnapshot.val().frequency +
+            "</td><td id='minutes-away-display'>" + childSnapshot.val().minAway);
+  
+
+    // Handle the errors
+    // function(errorObject) {
+    // console.log("Errors handled: " + errorObject.code);
+    // };
+
+      });
+
 
     // dataRef.ref().orderByChild("firstTrainAdded").limitToLast(1).on("child_added", function(snapshot) {
 
@@ -86,7 +90,7 @@ $(document).ready(function() {
 
 
     //                 // full list of items to the well
-    //             	//Joes Code
+    //              //Joes Code
     //                 // $("#full-member-list").append("<div class='well'><td id='name'>") + 
     //                 // childSnapShot.val().name + 
     //                 // <td id = 'name' > ") + childSnapShot.val().name +
