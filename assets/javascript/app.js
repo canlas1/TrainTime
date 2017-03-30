@@ -12,11 +12,19 @@ $(document).ready(function() {
         messagingSenderId: "773830722332"
     };
 
+    // Initializing app using config variable
     firebase.initializeApp(config);
 
     var dataRef = firebase.database();
     //on click function to add values
 
+    //.val("") is needed to clear to an empty string
+    function clearMyInput() {
+        var trainName = $("#train-name-input").val("");
+        var destination = $("#destination-input").val("");
+        var firstTrain = $("#first-train-input").val("");
+        var frequency = $("#frequency-min-input").val("");
+    }
 
     $("#submitForm").on("click", function(event) {
         event.preventDefault();
@@ -27,6 +35,9 @@ $(document).ready(function() {
         var firstTrain = $("#first-train-input").val().trim();
         var frequency = $("#frequency-min-input").val().trim();
         console.log(frequency);
+        console.log(trainName);
+        console.log(destination);
+        console.log(firstTrain);
         // alert("test")
 
         // At the initial load, get a snapshot of the current data.
@@ -39,7 +50,8 @@ $(document).ready(function() {
             firstTrainAdded: firebase.database.ServerValue.TIMESTAMP
         });
 
-
+        // CLEARS INPUTS!
+        clearMyInput();
     });
 
     // $("#submitForm")[0].reset();
