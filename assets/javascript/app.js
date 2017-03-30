@@ -25,7 +25,6 @@ $(document).ready(function() {
         var trainName = $("#train-name-input").val().trim();
         var destination = $("#destination-input").val().trim();
         var firstTrain = $("#first-train-input").val().trim();
-        var minAway = $("#minutes-away-input").val().trim();
         var frequency = $("#frequency-min-input").val().trim();
         console.log(frequency);
         // alert("test")
@@ -40,20 +39,46 @@ $(document).ready(function() {
             firstTrainAdded: firebase.database.ServerValue.TIMESTAMP
         });
 
-        //Firebase water + initial loader HINK: this code behaves similarly to .on("value")
-       
-
-        // dataRef.ref().limitToLast(1).on("child_added", function(snapshot){
-
-        //   $(".table tbody").append("<tr><td id='name-display'> " + snapshot.val().eName +
-        //         "</td><td id='role-display'>" + snapshot.val().Role +
-        //         "</td><td id='firstTrain-display'>" + snapshot.val().StartfirstTrain +
-        //         "</td><td id='month-display'>" + snapshot.val().MonthlyRate);
-        // })
 
     });
 
     dataRef.ref().on("child_added", function(childSnapshot) {
+
+var currentTime = moment();
+            // console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+            
+            var tFrequency = childSnapshot.val().frequency;
+            
+            console.log(tFrequency)
+           
+           // pushed back 1 year to make sure it comes before current time
+            var convertedDate = moment(childSnapshot.val().firstTrain, 'hh:mm').subtract(1, 'years');
+            var firstTime = moment(convertedDate).format('HH:mm');
+          
+            console.log(firstTime);
+            
+            // First Time (pushed back 1 year to make sure it comes before current time)
+            var firstTimeConverted = moment(firstTime, "HH:mm").subtract(1, "years");
+            console.log(firstTimeConverted);
+
+            // Difference between the times
+            var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+            console.log("DIFFERENCE IN TIME: " + diffTime);
+
+            //time remaining WTF
+            var tRemainder = diffTime % tFrequency;
+            console.log(tRemainder);
+
+
+            // Minute Until Train
+            var tMinutesTillTrain = tFrequency - tRemainder;
+            console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+   
+
+            //solved
+            var nextTrain = moment().add(tMinutesTillTrain, 'minutes').format('HH:mm')
+            console.log(nextTrain);
+
 
             // Log everything that's coming out of snapshot
             
@@ -68,55 +93,11 @@ $(document).ready(function() {
         $(".table tbody").append("<tr><td id='train-name-display'> " + childSnapshot.val().trainName +
             "</td><td id='destination-display'>" + childSnapshot.val().destination +
             "</td><td id='frequency-display'>" + childSnapshot.val().frequency +
-            "</td><td id='minutes-away-display'>" + childSnapshot.val().minAway);
+            "</td><td id='next-arival-display'>" + nextTrain 
+            +  "</td><td id='minutes-away-display'>" + tMinutesTillTrain);
   
-
-    // Handle the errors
-    // function(errorObject) {
-    // console.log("Errors handled: " + errorObject.code);
-    // };
-
       });
 
-
-    // dataRef.ref().orderByChild("firstTrainAdded").limitToLast(1).on("child_added", function(snapshot) {
-
-    //   // Change the HTML to reflect
-    //   $("#name-display").html(snapshot.val().name);
-    //   $("#email-display").html(snapshot.val().email);
-    //   $("#age-display").html(snapshot.val().age);
-    //   $("#comment-display").html(snapshot.val().comment);
-    // });
-
-
-    //                 // full list of items to the well
-    //              //Joes Code
-    //                 // $("#full-member-list").append("<div class='well'><td id='name'>") + 
-    //                 // childSnapShot.val().name + 
-    //                 // <td id = 'name' > ") + childSnapShot.val().name +
-    //                 // <td id='name'>") + childSnapShot.val().name + 
-    //                 // <td id = 'name' > ") + childSnapShot.val().name+ 
-
-
-    //             var tr = $("<tr>");
-    //             var tdName = $("<td>");
-    //             var tdRole = $("<td>");
-    //             var tdfirstTrain = $("<td>");
-    //             var tdRate = $("<td>");
-    //             var tdMonth = $("<td>");
-    //             var tdBilled = $("<td>")
-
-    //             tdName.attr("id", "name-display"); tdRole.attr("id", "role-display"); tdfirstTrain.attr("id", "firstTrain-display"); tdMonth.attr("id", "month-display"); tdRate.attr("id", "rate-display"); tdbilled.attr("id", "billed-display");
-
-    //             tr.append(tdName); tr.append(tdRole); tr.append(tdfirstTrain); tr.append(tdRate); tr.append(tdMonth); tr.append(tdBilled);
-    //             // <tr>
-    //     <td id="name display">John</td>
-    //     <td id="role-display">PM</td>
-    //     <td id="firstTrain-display">01/01/01</td>
-    //     <td id="month-display">10</td>
-    //     <td id="rate-display">100</td>
-    //     <td id="billed-display">1000</td>
-    // </tr>
 
 
 }); // !!!!!!!!!!!!!!!!!!!!END OF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! $(document).ready(function()
