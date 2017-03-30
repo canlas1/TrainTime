@@ -16,7 +16,7 @@ $(document).ready(function() {
     firebase.initializeApp(config);
 
     var dataRef = firebase.database();
-    //on click function to add values
+    
 
     //.val("") is needed to clear to an empty string
     function clearMyInput() {
@@ -25,24 +25,23 @@ $(document).ready(function() {
         var firstTrain = $("#first-train-input").val("");
         var frequency = $("#frequency-min-input").val("");
     }
-
+    //on click function to add values
     $("#submitForm").on("click", function(event) {
         event.preventDefault();
 
-
+        //.val().trim is needed to take whitespace
         var trainName = $("#train-name-input").val().trim();
         var destination = $("#destination-input").val().trim();
         var firstTrain = $("#first-train-input").val().trim();
         var frequency = $("#frequency-min-input").val().trim();
-        console.log(frequency);
-        console.log(trainName);
-        console.log(destination);
-        console.log(firstTrain);
-        // alert("test")
+        // console.log(frequency);
+        // console.log(trainName);
+        // console.log(destination);
+        // console.log(firstTrain);
 
-        // At the initial load, get a snapshot of the current data.
+
+        // At the initial load, get/pusha snapshot of the current data.
         dataRef.ref().push({
-
             trainName: trainName,
             destination: destination,
             firstTrain: firstTrain,
@@ -54,44 +53,43 @@ $(document).ready(function() {
         clearMyInput();
     });
 
-    // $("#submitForm")[0].reset();
-
+    //max 2 lines with limitToLast that shows when app starts
     dataRef.ref().limitToLast(2).on("child_added", function(childSnapshot) {
 
         var currentTime = moment();
         // console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
 
         var tFrequency = childSnapshot.val().frequency;
-        console.log(tFrequency)
+        //console.log(tFrequency)
 
-        // pushed back 1 year to make sure it comes before current time
-        var convertedDate = moment(childSnapshot.val().firstTrain, 'hh:mm').subtract(1, 'years');
+        // pushed back 1 year to make sure it comes before current time for the firstTrain input
+        var convertedDate = moment(childSnapshot.val().firstTrain, 'hh:mm').subtract(1, "years");
         
+        //format the time of the firstTrain start a year ago
         var firstTime = moment(convertedDate).format('HH:mm');
 
         console.log(firstTime);
 
         // First Time (pushed back 1 year to make sure it comes before current time)
         var firstTimeConverted = moment(firstTime, "HH:mm").subtract(1, "years");
-        console.log(firstTimeConverted);
+        //console.log(firstTimeConverted);
 
         // Difference between the times
         var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
-        console.log("DIFFERENCE IN TIME: " + diffTime);
+        //console.log("DIFFERENCE IN TIME: " + diffTime);
 
-        //time remaining WTF
+        //time remaining modelus is the remainder b/w the diffTime and frequency of train
+        
         var tRemainder = diffTime % tFrequency;
-        console.log(tRemainder);
-
+        //console.log(tRemainder);
 
         // Minute Until Train
         var tMinutesTillTrain = tFrequency - tRemainder;
         console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
 
-
         //solved
         var nextTrain = moment().add(tMinutesTillTrain, 'minutes').format('HH:mm')
-        console.log(nextTrain);
+        //console.log(nextTrain);
 
 
         // Log everything that's coming out of snapshot
